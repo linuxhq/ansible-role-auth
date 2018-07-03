@@ -36,7 +36,7 @@ None
               uid: 0
             tkimball:
               exclusive: yes
-              gid: 10
+              group: wheel
               key: ssh-rsa {...}
               key_options: []
               password: {...}
