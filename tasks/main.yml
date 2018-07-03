@@ -1,0 +1,28 @@
+---
+- name: Ensure that the passwd package is installed (Debian)
+  tags: auth
+  become: true
+  package:
+    name: passwd
+    state: present
+  register: auth_package
+  when: ansible_os_family == 'Debian'
+
+- name: Ensure that the shadow-utils package is installed (RedHat)
+  tags: auth
+  become: true
+  package:
+    name: shadow-utils
+    state: present
+  register: auth_package
+  when: ansible_os_family == 'RedHat'
+
+- name: Attempting to import auth related tasks
+  tags: auth
+  become: true
+  block:
+    - import_tasks: auth_gid.yml
+    - import_tasks: auth_uid.yml
+    - import_tasks: auth_ssh.yml
+  when: auth_package is success
+...

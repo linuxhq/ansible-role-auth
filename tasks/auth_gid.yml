@@ -1,0 +1,17 @@
+---
+- name: Attempting to overlay group configurations, if applicable
+  tags: auth
+  become: true
+  no_log: true
+  group:
+    gid: "{{ item.value.gid }}"
+    local: "{{ item.value.local|default(omit) }}"
+    name: "{{ item.key }}"
+    state: "{{ item.value.state|default(omit) }}"
+    system: "{{ item.value.system|default(omit) }}"
+  with_dict: "{{ auth_groups }}"
+  when:
+    - auth_groups|length > 0
+    - item.key is defined
+    - item.value.gid is defined
+...

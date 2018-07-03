@@ -1,0 +1,42 @@
+---
+- name: Attempting to overlay user configurations, if applicable
+  tags: users
+  become: true
+  no_log: true
+  user:
+    append: "{{ item.value.append|default(omit) }}"
+    comment: "{{ item.value.comment|default(item.key) }}"
+    create_home: "{{ item.value.create_home|default(omit) }}"
+    expires: "{{ item.value.expires|default(omit) }}"
+    force: "{{ item.value.force|default(omit) }}"
+    generate_ssh_key: "{{ item.value.generate_ssh_key|default(omit) }}"
+    group: "{{ item.value.group|default(item.key) }}"
+    groups: "{{ item.value.groups|default([])|join(',') }}"
+    hidden: "{{ item.value.hidden|default(omit) }}"
+    home: "{{ item.value.home|default(omit) }}"
+    local: "{{ item.value.local|default(omit) }}"
+    login_class: "{{ item.value.login_class|default(omit) }}"
+    move_home: "{{ item.value.move_home|default(omit) }}"
+    name: "{{ item.key }}"
+    non_unique: "{{ item.value.non_unique|default(omit) }}"
+    password: "{{ item.value.password|default(omit) }}"
+    password_lock: "{{ item.value.password_lock|default(omit) }}"
+    remove: "{{ item.value.remove|default(omit) }}"
+    seuser: "{{ item.value.seuser|default(omit) }}"
+    shell: "{{ item.value.shell|default(omit) }}"
+    skeleton: "{{ item.value.skeleton|default(omit) }}"
+    ssh_key_bits: "{{ item.value.ssh_key_bits|default(omit) }}"
+    ssh_key_comment: "{{ item.value.ssh_key_comment|default(omit) }}"
+    ssh_key_file: "{{ item.value.ssh_key_file|default(omit) }}"
+    ssh_key_passphrase: "{{ item.value.ssh_key_passphrase|default(omit) }}"
+    ssh_key_type: "{{ item.value.ssh_key_type|default(omit) }}"
+    state: "{{ item.value.state|default(omit) }}"
+    system: "{{ item.value.system|default(omit) }}"
+    uid: "{{ item.value.uid }}"
+    update_password: "{{ item.value.update_password|default(omit) }}"
+  with_dict: "{{ auth_users }}"
+  when:
+    - auth_users|length > 0
+    - item.key is defined
+    - item.value.uid is defined
+...
