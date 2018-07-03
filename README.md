@@ -14,8 +14,8 @@ None
 
 Available variables are listed below, along with default values:
 
-    auth_groups: []
-    auth_users: []
+    auth_groups: {}
+    auth_users: {}
       
 ## Dependencies
 

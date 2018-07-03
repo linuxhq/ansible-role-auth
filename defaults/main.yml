@@ -1,4 +1,4 @@
 ---
-auth_groups: []
-auth_users: []
+auth_groups: {}
+auth_users: {}
 ...
