@@ -17,12 +17,83 @@
   register: auth_package
   when: ansible_os_family == 'RedHat'
 
-- name: Attempting to import auth related tasks
+- name: Attempting to overlay group configurations, if applicable
   tags: auth
   become: true
-  block:
-    - import_tasks: auth_gid.yml
-    - import_tasks: auth_uid.yml
-    - import_tasks: auth_ssh.yml
-  when: auth_package is success
+  group:
+    gid: "{{ item.value.gid }}"
+    local: "{{ item.value.local|default(omit) }}"
+    name: "{{ item.key }}"
+    state: "{{ item.value.state|default(omit) }}"
+    system: "{{ item.value.system|default(omit) }}"
+  loop: "{{ auth_groups|dict2items }}"
+  loop_control:
+    label: "{{ item.key }}"
+  when:
+    - auth_groups|length > 0
+    - item.key is defined
+    - item.value.gid is defined
+
+- name: Attempting to overlay user configurations, if applicable
+  tags: auth
+  become: true
+  user:
+    append: "{{ item.value.append|default(omit) }}"
+    comment: "{{ item.value.comment|default(item.key) }}"
+    create_home: "{{ item.value.create_home|default(omit) }}"
+    expires: "{{ item.value.expires|default(omit) }}"
+    force: "{{ item.value.force|default(omit) }}"
+    generate_ssh_key: "{{ item.value.generate_ssh_key|default(omit) }}"
+    group: "{{ item.value.group|default(item.key) }}"
+    groups: "{{ item.value.groups|default([])|join(',') }}"
+    hidden: "{{ item.value.hidden|default(omit) }}"
+    home: "{{ item.value.home|default(omit) }}"
+    local: "{{ item.value.local|default(omit) }}"
+    login_class: "{{ item.value.login_class|default(omit) }}"
+    move_home: "{{ item.value.move_home|default(omit) }}"
+    name: "{{ item.key }}"
+    non_unique: "{{ item.value.non_unique|default(omit) }}"
+    password: "{{ item.value.password|default(omit) }}"
+    password_lock: "{{ item.value.password_lock|default(omit) }}"
+    remove: "{{ item.value.remove|default(omit) }}"
+    seuser: "{{ item.value.seuser|default(omit) }}"
+    shell: "{{ item.value.shell|default(omit) }}"
+    skeleton: "{{ item.value.skeleton|default(omit) }}"
+    ssh_key_bits: "{{ item.value.ssh_key_bits|default(omit) }}"
+    ssh_key_comment: "{{ item.value.ssh_key_comment|default(omit) }}"
+    ssh_key_file: "{{ item.value.ssh_key_file|default(omit) }}"
+    ssh_key_passphrase: "{{ item.value.ssh_key_passphrase|default(omit) }}"
+    ssh_key_type: "{{ item.value.ssh_key_type|default(omit) }}"
+    state: "{{ item.value.state|default(omit) }}"
+    system: "{{ item.value.system|default(omit) }}"
+    uid: "{{ item.value.uid }}"
+    update_password: "{{ item.value.update_password|default(omit) }}"
+  loop: "{{ auth_users|dict2items }}"
+  loop_control:
+    label: "{{ item.key }}"
+  when:
+    - auth_users|length > 0
+    - item.key is defined
+    - item.value.uid is defined
+
+- name: Attempting to overlay public ssh configurations, if applicable
+  tags: auth
+  become: true
+  authorized_key:
+    comment: "{{ item.value.comment|default(item.key) }}"
+    exclusive: "{{ item.value.exclusive|default(omit) }}"
+    key: "{{ item.value.key }}"
+    key_options: "{{ item.value.key_options|default([])|join(',') }}"
+    manage_dir: "{{ item.value.manage_dir|default(omit) }}"
+    path: "{{ item.value.path|default(omit) }}"
+    state: "{{ item.value.state|default(omit) }}"
+    user: "{{ item.key }}"
+    validate_certs: "{{ item.value.validate_certs|default(omit) }}"
+  loop: "{{ auth_users|dict2items }}"
+  loop_control:
+    label: "{{ item.key }}"
+  when:
+    - auth_users|length > 0
+    - item.key is defined
+    - item.value.key is defined
 ...
